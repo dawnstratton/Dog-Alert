@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
+
+        <title>Calm Dogs</title>
+
+        <!--  -->
+
+        <style>
+.alert {
+    padding: 20px;
+    background-color: #f44336;
+    color: white;
+    opacity: 1;
+    transition: opacity 0.6s;
+    margin-bottom: 15px;
+}
+
+.info {
+    padding: 20px;
+    background-color: #4CAF50;
+    color: white;
+    opacity: 1;
+    transition: opacity 0.6s;
+    margin-bottom: 15px;
+}
+
+.alert.success {background-color: #4CAF50;}
+.alert.info {background-color: #2196F3;}
+.alert.warning {background-color: #ff9800;}
+
+.closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.closebtn:hover {
+    color: black;
+}
+        </style>
+
+        </head>
+
+        <body>
+
+        <div class="container">
+<!--         <button id="button">Get Data</button> -->
+            <div><H1>Dog Alert</H1></div>
+        <div id="show"></div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+        <script>
+
+
+        //API Doggie Alert
+        //Retrieve 3 day forecast that will allow a dog owner to know in advance to administer calming medication in a timely manner to keep the dog calm while alone at home during loud weather.
+            var close = document.getElementsByClassName("closebtn");
+            close.onclick = function(){
+            var div = this.parentElement;
+            div.style.opacity = "0";
+            setTimeout(function(){div.style.display = "none";}, 600);
+            }
+            
+            //        Asynchronous GET HTTP Request
+        data='';  
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%3D2391279&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys", true);
+        xhr.onload = function (e) {
+        if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+        data = xhr.responseText;
+        showUser(data);
+          //   console.log('in the function '+data);
+        } else {
+        console.error(xhr.statusText);
+        }
+        }
+        };
+        xhr.onerror = function (e) {
+        console.error(xhr.statusText);
+        };
+        xhr.send(null);      
+
+        function showUser(data){
+       // console.log(data);
+        
+            var text = '';
+           
+            
+            data = JSON.parse(data);
+            //console.log(data);
+            res = data.query.results.channel.item.condition;
+            //console.log(res);
+            //console.log(res.date);
+            title = data.query.results.channel.title;
+            //console.log(title);
+            sun = data.query.results.channel.astronomy;
+            //console.log('Sunrise: '+sun.sunrise);
+            //console.log('Sunset: '+sun.sunset);
+            forecast = data.query.results.channel.item.forecast;
+             text += '<div>'+title+'</div>';
+            text += '<div>Sunrise: '+sun.sunrise+'</div>';
+            text += '<div>Sunset: '+sun.sunset+'</div>';
+            //console.log(forcast);
+            
+            for(var i=0; i<forecast.length-7;i++){
+                
+                text += '<div><H3>'+forecast[i].date+'</div></H3>';
+                 text += '<div><H5>Day '+forecast[i].day+'</div></H5>';
+                 text += '<div><H5>High '+forecast[i].high+'</div></H5>';
+                 text += '<div><H5>Low '+forecast[i].low+'</div></H5>';
+                 text += '<div><H5>Forecast  '+forecast[i].text+'</div></H5>';
+                text += dogOptions(data);
+                //if (forecast[i].code == '32'){
+                    //alert(hail);
+              
+               // text += '<div class="alert">';
+                //text+= '<span class="closebtn">&times;</span>';
+  //text += '<strong>Alert!</strong> Administer meds before you leave.</div>';
+               // }
+            }
+
+        document.getElementById('show').innerHTML = text;    
+            
+       } 
+            
+      function readData(data) {
+        
+            readable = data.query.results.channel.item.condition;
+            return readable;
+        }
+
+        function dogOptions(data) {
+
+            weatherCode = readData(data).code;
+            console.log(weatherCode);
+            var response = "";
+            switch (parseInt(weatherCode)) {
+                case 0:
+                 response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Tornado! Administer your pet the calming meds in advance.</div>';
+                  break;
+                case 1:
+                      response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>tropical storm! Administer your pet the calming meds in advance.</div>';
+                break;
+                    case 3:
+                response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Severe thunderstorm storm! Administer your pet the calming meds in advance.</div>';   
+                break;
+                    case 4:
+                response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Thunderstorms! Administer your pet the calming meds in advance.</div>';
+                break;
+                case 5:
+                 response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Mixed rain & snow! Administer your pet the calming meds in advance.</div>';
+                  break;
+                case 6:
+                  response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Mixed rain & sleet! Administer your pet the calming meds in advance.</div>';
+                  break;
+                case 7:
+                  response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Warning!</strong>Mixed sleet & snow! Administer your pet the calming meds in advance if needed!</div>';
+                  break;
+                    case 10:
+                  response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Freezing rain! Administer your pet the calming meds in advance.</div>';
+                  break;
+                    case 11:
+                  response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Showers! Administer your pet the calming meds in advance.</div>';
+                  break;
+                    case 12:
+                  response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Warning!</strong>Showers! Administer your pet the calming meds in advance.</div>';
+                  break;
+                case 17:
+                  response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Hail! Administer your pet the calming meds in advance.</div>';
+                  break;
+                case 35:
+               response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Mixed ran and hail! Administer your pet the calming meds in advance.</div>';
+                break;
+                    case 37:
+                response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Isolated thunderstorms! Administer your pet the calming meds in advance.</div>';
+                break;
+                    case 38:
+                    response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Scattered thunderstorms"! Administer your pet the calming meds in advance.</div>';
+                break;
+                    case 39:
+                    response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Scattered thunderstorms! Administer your pet the calming meds in advance.</div>';
+                break;
+                case 40:
+                response += '<div class="alert">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Scattered showers! Administer your pet the calming meds in advance.</div>';
+                break;
+                    case 47:
+                    response += '<div class="alert">';
+                    response += '<span class="closebtn">&times;</span>';
+                    response += '<strong>Alert!</strong>Isolated thundershowers! Administer your pet the calming meds in advance.</div>';
+                break;
+                    default:
+                  response += '<div class="info">';
+                response += '<span class="closebtn">&times;</span>';
+                    response += 'Your dog will be okay.</div>';
+            }
+            return response;
+        }
+
+</script>
+
+
+        </body>
+
+        </html>
